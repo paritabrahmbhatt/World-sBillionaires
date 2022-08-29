@@ -1,0 +1,273 @@
+---
+title: "The World's Billionaires"
+output: 
+  flexdashboard::flex_dashboard:
+       orientation: columns 
+       social: menu
+       source_code: embed
+       #css: style.css
+runtime: shiny
+---
+
+```{r warning=FALSE, message=FALSE, include=FALSE}
+# R Packages
+
+library(readr)
+library(DT)
+library(tidyverse)
+library(dplyr)
+library(gganimate)
+library(plotly)
+library(shiny)
+#library(shinythemes)
+library(flexdashboard)
+library(rsconnect)
+library(leaflet)
+library(crosstalk)
+
+continents <- read.csv('continents.csv')
+continents <- continents %>% select(c(Country,Continent))
+db11 <- read.csv('Billionaire 2011 - Sheet1.csv', header = TRUE)
+db12 <- read.csv('Billionaire 2012 - Sheet1.csv', header = TRUE)
+db13 <- read.csv('Billionaire 2013 - Sheet1.csv', header = TRUE)
+db14 <- read.csv('Billionaire 2014 - Sheet1.csv', header = TRUE)
+db15 <- read.csv('Billionaire 2015 - Sheet1.csv', header = TRUE)
+db16 <- read.csv('Billionaire 2016 - Sheet1.csv', header = TRUE)
+db17 <- read.csv('Billionaire 2017 - Sheet1.csv', header = TRUE)
+db18 <- read.csv('Billionaire 2018 - Sheet1.csv', header = TRUE)
+db19 <- read.csv('Billionaire 2019 - Sheet1.csv', header = TRUE)
+db20 <- read.csv('FB_2020.csv', header = TRUE)
+db21 <- read.csv('FB_2021.csv', header = TRUE)
+db22 <- read.csv('FB_2022.csv', header = TRUE)
+
+# All of the data did not have the column for Continents. Hence, I merged the data with the data of the continents.
+db11 <- left_join(db11,continents, by = 'Country')
+db12 <- left_join(db12,continents, by = 'Country')
+db13 <- left_join(db13,continents, by = 'Country')
+db14 <- left_join(db14,continents, by = 'Country')
+db15 <- left_join(db15,continents, by = 'Country')
+db16 <- left_join(db16,continents, by = 'Country')
+db17 <- left_join(db17,continents, by = 'Country')
+db17$NetWorth <- (as.numeric(db17$NetWorth)) # Net Worth had a character type
+db18 <- left_join(db18,continents, by = 'Country')
+db19 <- left_join(db19,continents, by = 'Country')
+db19$NetWorth <- (as.numeric(db19$NetWorth))
+db20 <- left_join(db20,continents, by = 'Country')
+db20$NetWorth <- (as.numeric(db20$NetWorth))
+db21 <- left_join(db21,continents, by = 'Country')
+db21$Age <- as.numeric(db21$Age)
+db22 <- left_join(db22, continents, by = "Country")
+
+library(DT)
+db11_DT <- datatable(db11)
+db12_DT <- datatable(db12)
+db13_DT <- datatable(db13)
+db14_DT <- datatable(db14)
+db15_DT <- datatable(db15)
+db16_DT <- datatable(db16)
+db17_DT <- datatable(db17)
+db18_DT <- datatable(db18)
+db19_DT <- datatable(db19)
+db20_DT <- datatable(db20)
+db21_DT <- datatable(db21)
+db22_DT <- datatable(db22)
+```
+
+
+
+Distribution of Net Worth over the Continents
+===
+Inputs {.sidebar}
+------------------------------------------------------------
+
+### Analysis on Forbes Billionaire List 2022
+The data used for the visualization represents the World's Billionaire list published by Forbes magazine . This data was downloaded from Kaggle.com. 
+```{r}
+# Choose a color for border
+selectInput(inputId = 'Color_border',
+            label = 'Choose a Color for border',
+            choices =  colors())
+
+# Choose a color for fill
+selectInput(inputId = 'Color_fill',
+            label = 'Choose a Color for fill',
+            choices =  colors())
+```
+
+Column {data-width=150, .tabset}
+--------------------------------------------------------------------
+
+### Bar plot for the Networth distribution over the conitnents - 2022
+
+```{r}
+
+dbp22 <- db22 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n())
+
+#create a histogram from inputs
+renderPlotly(ggplot(dbp22,aes(x= Continent,y = Sum))+
+             geom_bar(fill=input$Color_fill,
+                            col=input$Color_border,
+                      stat = "identity")+
+             labs(y = 'Sum in Billion Dollars'))
+
+```
+
+### Bar plot for the Networth distribution over the conitnents - 2021
+
+```{r}
+
+dbp21 <- db21 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n())
+
+#create a histogram from inputs
+renderPlotly(ggplot(dbp21,aes(x= Continent,y = Sum))+
+             geom_bar(fill=input$Color_fill,
+                            col=input$Color_border,
+                      stat = "identity")+
+             labs(y = 'Sum in Billion Dollars'))
+
+```
+
+### Bar plot for the Networth distribution over the conitnents - 2020
+
+```{r}
+dbp20 <- db20 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n())
+
+#create a histogram from inputs
+renderPlotly(ggplot(dbp20,aes(x= Continent,y = Sum))+
+             geom_bar(fill=input$Color_fill,
+                            col=input$Color_border,
+                      stat = "identity")+
+             labs(y = 'Sum in Billion Dollars'))
+
+```
+
+
+Interactive Data Table for 2022
+===
+Inputs {.sidebar}
+-----------------------------------------------------------------
+
+```{r}
+st1 <- db22
+st <- SharedData$new(st1)
+```
+
+### Filters
+```{r filter_section}
+
+filter_select(
+  id = "Country",
+  label = "Country",
+  sharedData = st,
+  group = ~Continent
+)
+
+bscols(
+  filter_checkbox(
+    id = 'Continent',
+    label = 'Continent',
+    sharedData = st,
+    group = ~Continent
+  )
+)
+
+```
+
+
+Column {data-width = 800}
+------------------------------------------------------
+
+### Datatable
+
+
+```{r filter_table}
+datatable(st)
+```
+
+Data
+===
+
+## Review Data Of Dataset {data-width=100, .tabset}
+
+The tables below shows the data that was used for the analysis. Sources: Forbes Billionaire List
+
+### Billionaire's list- 2011
+
+```{r ,echo = FALSE}
+db11_DT   
+```
+
+### Billionaire's list- 2012
+
+```{r ,echo = FALSE}
+db12_DT
+```
+
+### Billionaire's list- 2013
+
+```{r ,echo = FALSE}
+db13_DT
+```
+
+### Billionaire's list- 2014
+
+```{r ,echo = FALSE}
+db14_DT
+```
+
+### Billionaire's list- 2015
+
+```{r ,echo = FALSE}
+db15_DT
+```
+
+### Billionaire's list- 2016
+
+```{r ,echo = FALSE}
+db16_DT
+```
+
+### Billionaire's list- 2017
+
+```{r ,echo = FALSE}
+db17_DT
+```
+
+### Billionaire's list- 2018
+
+```{r ,echo = FALSE}
+db18_DT
+```
+
+### Billionaire's list- 2019
+
+```{r ,echo = FALSE}
+db19_DT
+```
+
+### Billionaire's list- 2020
+
+```{r ,echo = FALSE}
+db20_DT
+```
+
+### Billionaire's list- 2021
+
+```{r ,echo = FALSE}
+db21_DT
+```
+
+### Billionaire's list- 2022
+
+```{r ,echo = FALSE}
+db22_DT
+```

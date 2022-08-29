@@ -1,0 +1,856 @@
+---
+title: "The World's Billionaires"
+author: "Parita Pragnesh Brahmbhatt"
+output:
+  rmdformats::material:
+    #theme: journal
+    #df_print: paged
+    code_folding: hide
+---
+
+```{r warning=FALSE, message=FALSE, include=FALSE}
+# R Packages
+
+library(readr)
+library(DT)
+library(tidyverse)
+library(dplyr)
+library(gganimate)
+library(plotly)
+library(rstatix)
+library(ggpubr)
+library(scales)
+```
+
+# Abstract
+
+The World's Billionaire is an annual ranking list published in every March by the American business magazine [Forbes](https://www.forbes.com/?sh=b9811ca2254c).This list contains the world's wealthiest billionaires.Forbes has been publishing the Billionaire's list since 1987. This statistical study examines the data from the year 2011 to 2022.
+
+![Source: vietnamtime.org.vn](https://vietnamtimes.org.vn/stores/news_dataimages/dieulinhvnt/042020/08/14/in_article/5631_The-25-Richest-People-in-the-Wor.png)
+
+# Introduction
+
+Every year Forbes publishes a list which contains the world's wealthiest billionaires. There are many factors which plays a huge roll to become rich. In this analysis, various data visualization and statistical analysis were conducted to find out the similarities and dissimilarities between this people. This study provides analysis of multiple variables such as continents, age groups, industry, etc to find the correlations between the data. At end of the study, hypothesis test has been performed to find out whether COVID 19 has impacted the growth in net worth of the billionaires or not. For this entire study, the data sets from the year 2011 to 2022 were used. Each data set contains at least 7 variables and 2200 observations.  
+
+
+# Data {.tabset}
+
+## Packages
+
+The following packages were used for the analysis of the data. All of the packages are supported by R and you can download them by using 'Packages' tab.
+
+`readr`
+
+`DT`
+
+`tidyverse`
+
+`dplyr`
+
+`gganimate`
+
+`plotly`
+
+`rstatix`
+
+`ggpubr`
+
+`scales`
+
+## Description of the data
+The data used for the analysis was downloaded from different sources on the internet.Hence, the variable names in each data frame were different from the other. I have edited the variable names using MS Excel. The following are the variables of the data sets and their description.
+
+`Rank` - The rank given by Forbes
+
+`Name` - Name of the Billionaire
+
+`Country` - Citizenship
+
+`Age` - Age
+
+`NetWroth` - Net worth in Billion Dollars
+
+`Industry` - Name of the Industry
+
+`Continent` - Continent
+
+```{r warning=FALSE, message=FALSE}
+# Load the data
+continents <- read.csv('continents.csv')
+continents <- continents %>% select(c(Country,Continent))
+db11 <- read.csv('Billionaire 2011 - Sheet1.csv')
+db12 <- read.csv('Billionaire 2012 - Sheet1.csv')
+db13 <- read.csv('Billionaire 2013 - Sheet1.csv')
+db14 <- read.csv('Billionaire 2014 - Sheet1.csv')
+db15 <- read.csv('Billionaire 2015 - Sheet1.csv')
+db16 <- read.csv('Billionaire 2016 - Sheet1.csv')
+db17 <- read.csv('Billionaire 2017 - Sheet1.csv')
+db18 <- read.csv('Billionaire 2018 - Sheet1.csv')
+db19 <- read.csv('Billionaire 2019 - Sheet1.csv')
+db20 <- read.csv('FB_2020.csv')
+db21 <- read.csv('FB_2021.csv')
+db22 <- read.csv('FB_2022.csv')
+
+```
+
+## Preprocessing
+
+The data does not classifies countries based on the continents. So, I have downloaded a separate data for Continents and I will merge the continental data with both of the data frames from 2011 an 2021. To do this, I am going to use the `left_join` function. 
+
+```{r warning=FALSE, message=FALSE}
+# All of the data did not have the column for Continents. Hence, I merged the data with the data of the continents.
+db11 <- left_join(db11,continents, by = 'Country')
+db12 <- left_join(db12,continents, by = 'Country')
+db13 <- left_join(db13,continents, by = 'Country')
+db14 <- left_join(db14,continents, by = 'Country')
+db15 <- left_join(db15,continents, by = 'Country')
+db16 <- left_join(db16,continents, by = 'Country')
+db17 <- left_join(db17,continents, by = 'Country')
+db17$NetWorth <- (as.numeric(db17$NetWorth)) # Net Worth had a character type
+db18 <- left_join(db18,continents, by = 'Country')
+db19 <- left_join(db19,continents, by = 'Country')
+db19$NetWorth <- (as.numeric(db19$NetWorth))
+db20 <- left_join(db20,continents, by = 'Country')
+db20$NetWorth <- (as.numeric(db20$NetWorth))
+db21 <- left_join(db21,continents, by = 'Country')
+db21$Age <- as.numeric(db21$Age)
+db22 <- left_join(db22, continents, by = "Country")
+
+```
+
+## Datatable {.tabset .tabset-dropdown}
+
+```{r message=FALSE,warning=FALSE}
+library(DT)
+db11_DT <- datatable(db11)
+db12_DT <- datatable(db12)
+db13_DT <- datatable(db13)
+db14_DT <- datatable(db14)
+db15_DT <- datatable(db15)
+db16_DT <- datatable(db16)
+db17_DT <- datatable(db17)
+db18_DT <- datatable(db18)
+db19_DT <- datatable(db19)
+db20_DT <- datatable(db20)
+db21_DT <- datatable(db21)
+db22_DT <- datatable(db22)
+```
+
+### Billionaire's list- 2011
+
+```{r ,echo = FALSE}
+db11_DT   
+```
+
+### Billionaire's list- 2012
+
+```{r ,echo = FALSE}
+db12_DT
+```
+
+
+### Billionaire's list- 2013
+
+```{r ,echo = FALSE}
+db13_DT
+```
+
+### Billionaire's list- 2014
+
+```{r ,echo = FALSE}
+db14_DT
+```
+
+### Billionaire's list- 2015
+
+```{r ,echo = FALSE}
+db15_DT
+```
+
+### Billionaire's list- 2016
+
+```{r ,echo = FALSE}
+db16_DT
+```
+
+### Billionaire's list- 2017
+
+```{r ,echo = FALSE}
+db17_DT
+```
+
+### Billionaire's list- 2018
+
+```{r ,echo = FALSE}
+db18_DT
+```
+
+### Billionaire's list- 2019
+
+```{r ,echo = FALSE}
+db19_DT
+```
+
+### Billionaire's list- 2020
+
+```{r ,echo = FALSE}
+db20_DT
+```
+
+### Billionaire's list- 2021
+
+```{r ,echo = FALSE}
+db21_DT
+```
+
+### Billionaire's list- 2022
+
+```{r ,echo = FALSE}
+db22_DT
+```
+
+```{r include=FALSE}
+rm(db11_DT)
+rm(db12_DT)
+rm(db13_DT)
+rm(db14_DT)
+rm(db15_DT)
+rm(db16_DT)
+rm(db17_DT)
+rm(db18_DT)
+rm(db19_DT)
+rm(db20_DT)
+rm(db21_DT)
+rm(db22_DT)
+```
+
+# Data Visualization {.tabset}
+
+## Money spread over the continents  {.tabset}
+
+Let us see the money spread over the continents, using the scatter plot. For this Visualization, the data from the year 2011 to 2021 was used. After this visualization we would be able to see which continents has the highest number of billionaires and their total Net worth.
+
+### Data Processing
+
+For this visualization, I created temporary data frames for different years which consisted of sum of Net worth of the billionaires in a given continent and the total number of billionaires in that continent. After creating these data frames, I merged all of the data frames in one data frame `db_r_p` using `full_join` function.
+
+```{r warning=FALSE, message=FALSE}
+
+db_r_p11 <- db11 %>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2011)
+
+db_r_p12 <- db12 %>%
+  group_by(Continent) %>%
+  drop_na()%>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2012)
+
+db_r_p13 <- db13 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2013)
+
+db_r_p14 <- db14 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2014)
+
+db_r_p15 <- db15 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2015)
+
+db_r_p16 <- db16 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2016)
+
+db_r_p17 <- db17 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2017)
+
+
+db_r_p18 <- db18 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2018)
+
+
+db_r_p19 <- db19 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2019)
+
+
+db_r_p20 <- db20 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2020)
+
+db_r_p21 <- db21 %>%
+  drop_na()%>%
+  group_by(Continent) %>%
+  summarise(Sum = sum(NetWorth), count = n()) %>%
+  mutate(year = 2021)
+
+#Merge the data
+db_r_p <- full_join(db_r_p11,db_r_p12)
+db_r_p <- full_join(db_r_p, db_r_p13)
+db_r_p <- full_join(db_r_p, db_r_p14)
+db_r_p <- full_join(db_r_p, db_r_p15)
+db_r_p <- full_join(db_r_p, db_r_p16)
+db_r_p <- full_join(db_r_p, db_r_p17)
+db_r_p <- full_join(db_r_p, db_r_p18)
+db_r_p <- full_join(db_r_p, db_r_p19)
+db_r_p <- full_join(db_r_p, db_r_p20)
+db_r_p <- full_join(db_r_p, db_r_p21)
+#db11_r_p %>% ggplot(aes(x= 'Networth'))+
+  #geom_bar(aes(color = Continent))
+
+rm(db_r_p11)
+rm(db_r_p12)
+rm(db_r_p13)
+rm(db_r_p14)
+rm(db_r_p15)
+rm(db_r_p16)
+rm(db_r_p17)
+rm(db_r_p18)
+rm(db_r_p19)
+rm(db_r_p20)
+rm(db_r_p21)
+```
+
+
+### Analysis
+<h2> Which continent has highest amount of money spread?</h2>
+
+To answer the question, first I cleaned the data and then decided to print the scatter plot for each continent. Firstly, I made another data frame which had sum of the total wealth of the billionaires of a given continent in a given year. After that, the interactive graph was printed using the `ggplotly` function. For this analysis, the data from 2011 to 2021 was used.
+
+
+```{r warning=FALSE, message=FALSE}
+p <- db_r_p %>% group_by(year) %>% 
+  ggplot(aes(y = count,x= Sum, label=paste(year)))+
+  geom_point(aes(size = Sum, color = Continent))+
+  facet_wrap(~Continent,scales = "free", nrow = 2) +
+  #scale_colour_viridis_d()+
+  #scale_size(range = c(2, 10)) +
+  #scale_x_log10()+
+  labs(x= "Sum of Networth in Billion dollars", y = "Number of Billionaires", size = 'Sum of NetWorth', title = 'Money spread over the continents')
+
+#p + geom_text()
+ggplotly(p)
+
+rm(db_r_p)
+rm(p)
+
+```
+
+From the above visualization, we can see that North America had the highest amount of wealth whereas Asia had highest number of billionaires through out the years. 
+
+## Does Age group matter? {.tabset}
+
+To answer this question, data of Forbes Billionaire list from 2011 to 2021 was used. 
+
+### Data Cleaning
+
+The data in the `Age` variable was a string data type. After printing the data, I came to know that The Age variable has different character strings (such as 'N/A' , 'n/a' and '-') to represent the `NA` values. So, to convert the `Age` variable to the numeric data type, all the rows with such values were removed and then the variable was converted to numeric type using `as.numeric` function.
+
+```{r warning=FALSE, message=FALSE}
+#Next I wanted to do the analysis for the ages of the billionaires. Below is the data cleaning for the analysis.
+
+# Here, I have removed the observations with character type and convert the 'Age' into numeric data type.
+db11a <- db11[!grepl("N/A", db11$Age),] 
+db11a$Age <- as.numeric(db11a$Age)
+
+db12a <- db12[!grepl("N/A", db12$Age),] 
+db12a$Age <- as.numeric(db12a$Age)
+
+db13a <- db13[!grepl("-", db13$Age),] 
+db13a$Age <- as.numeric(db13a$Age)
+
+db14a <- db14[!grepl("n/a", db14$Age),] 
+db14a$Age <- as.numeric(db14a$Age)
+
+db15a <- db15[!grepl("n/a", db15$Age),] 
+db15a$Age <- as.numeric(db15a$Age)
+
+db16a <- db16[!grepl("n/a", db16$Age),] 
+db16a$Age <- as.numeric(db16a$Age)
+
+db17a <- db17[!grepl("n/a", db17$Age),] 
+db17a$Age <- as.numeric(db17a$Age)
+db17a$Rank <- as.numeric(db17a$Rank)
+
+
+db18a <- db18[!grepl("-", db18$Age),] 
+db18a$Age <- as.numeric(db18a$Age)
+
+db21$Age <- as.numeric(db21$Age)
+
+
+```
+
+### Analysis
+
+<h2> What are the chances of you becoming a billionaire? </h2>
+
+In order to find out which age group dominates the billionaire's list from the year 2011 to 2021, I decided to print the scatter plot. The data was divided by using two age groups. The first age group contained the billionaires under 50 and other group contained billionaires above age 50.
+
+```{r warning=FALSE, message=FALSE}
+# Let us plot a bar graph for billionaires above the and below the age 50
+# To do this, I am adding a variable with binary values. If age is greater or equal than 50 then it has value 1.
+# I have removed the NA values from the Age column.
+db11_age <- db11a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2011)
+
+db12_age <- db12a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2012)
+
+db1 <- full_join(db11_age,db12_age)
+#db1 <- db1 %>% select(Rank : year)
+
+db13_age <- db13a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2013)
+db1 <- full_join(db1,db13_age)
+
+db14_age <- db14a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2014)
+db1 <- full_join(db1,db14_age)
+
+db15_age <- db15a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2015)
+db1 <- full_join(db1,db15_age)
+
+db16_age <- db16a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2016)
+db1 <- full_join(db1,db16_age)
+
+db17_age <- db17a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2017)
+db1 <- full_join(db1,db17_age)
+
+db18_age <- db18a %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2018)
+db1 <- full_join(db1,db18_age)
+
+db20_age <- db20 %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2020)
+db1 <- full_join(db1,db20_age)
+
+db21_age <- db21 %>% mutate(Age_edited = case_when(Age <50 ~ 'Under 50',
+                                             Age >= 50 ~ 'Over 50'), year = 2021)
+db1 <- full_join(db1,db21_age)
+
+
+
+rm(db12a)
+rm(db11a)
+rm(db13a)
+rm(db14a)
+rm(db15a)
+rm(db16a)
+rm(db17a)
+rm(db18a)
+rm(db19a)
+rm(db20a)
+rm(db21a)
+
+rm(db12_age)
+rm(db11_age)
+rm(db13_age)
+rm(db14_age)
+rm(db15_age)
+rm(db16_age)
+rm(db17_age)
+rm(db18_age)
+rm(db19_age)
+rm(db20_age)
+rm(db21_age)
+
+
+db1_summary <- db1 %>%
+  select(Continent, year, Age_edited)%>%
+  mutate(year=as.factor(year)) %>%
+  drop_na()%>%
+  group_by(Age_edited,Continent,year)%>%
+  summarise(n = n())
+rm(db1)
+
+plot_base_clean <- db1_summary %>%
+  group_by(Age_edited) %>%
+  #filter(Age_edited == 0)%>%
+  ggplot(aes(x= year, y = n, group = 1, colour=as.factor(Age_edited))) +  
+  geom_line()+
+  geom_point() +
+  #coord_flip()+
+  labs(x = 'Year', y = 'Count', colour='AgeGroup', title = 'Distribution of Age Groups over the years') +
+     # apply basic black and white theme - this theme removes the background colour by default
+  theme_bw() + 
+     # remove gridlines. panel.grid.major is for vertical lines, panel.grid.minor is for horizontal lines
+  #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    # remove borders
+  theme(panel.border = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+    # removing borders also removes x and y axes. Add them back
+  axis.line = element_line())
+rm(db1_summary)
+
+x <- plot_base_clean + facet_wrap(~Continent, nrow = 2) #,scales = "free") 
+rm(plot_base_clean)
+
+  #theme(axis.text.x = element_text(angle = 40),panel.spacing = unit(1, "lines"))
+#ggplotly(x)
+
+#rm(x)
+ggplotly(x)
+```
+
+From the plots, it is clear that for every the continent, billionaires over age of 50 dominate the Forbes Billionaire's list. This may indicate that it takes time to earn such a huge amount of money.
+
+
+
+<h4> Does this mean, as a billionaire, the more your age the more likely you will find a billionaire of your age? </h4>
+
+From the previous plot, we came to know that most of the billionaires are older than 50 years. However, does it mean that the more you age is the more you earn money. I enhanced my study further by dividing the billionaires age over 50 into two groups. 
+1. Billionaires who are older than 50 but younger than 60
+2. Billionaires who are older than 60
+
+To answer this question, I have decided to plot another line graph.
+
+```{r include = FALSE, message=FALSE, warning=FALSE}
+
+# The data was cleaned first and then the billionaires were divided into two age gropups using case_when function.
+
+db11a <- db11[!grepl("N/A", db11$Age),] 
+db11a$Age <- as.numeric(db11a$Age)
+
+db12a <- db12[!grepl("N/A", db12$Age),] 
+db12a$Age <- as.numeric(db12a$Age)
+
+db13a <- db13[!grepl("-", db13$Age),] 
+db13a$Age <- as.numeric(db13a$Age)
+
+db14a <- db14[!grepl("n/a", db14$Age),] 
+db14a$Age <- as.numeric(db14a$Age)
+
+db15a <- db15[!grepl("n/a", db15$Age),] 
+db15a$Age <- as.numeric(db15a$Age)
+
+db16a <- db16[!grepl("n/a", db16$Age),] 
+db16a$Age <- as.numeric(db16a$Age)
+
+db17a <- db17[!grepl("n/a", db17$Age),] 
+db17a$Age <- as.numeric(db17a$Age)
+db17a$Rank <- as.numeric(db17a$Rank)
+
+
+db18a <- db18[!grepl("-", db18$Age),] 
+db18a$Age <- as.numeric(db18a$Age)
+
+db21$Age <- as.numeric(db21$Age)
+
+db11_age1 <- db11a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2011)
+
+db12_age1 <- db12a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2012)
+
+db1 <- full_join(db11_age1,db12_age1)
+#db1 <- db1 %>% select(Rank : year)
+
+db13_age1 <- db13a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2013)
+db1 <- full_join(db1,db13_age1)
+
+db14_age1 <- db14a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2014)
+db1 <- full_join(db1,db14_age1)
+
+db15_age1 <- db15a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2015)
+db1 <- full_join(db1,db15_age1)
+
+db16_age1 <- db16a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2016)
+db1 <- full_join(db1,db16_age1)
+
+db17_age1 <- db17a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2017)
+db1 <- full_join(db1,db17_age1)
+
+db18_age1 <- db18a %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2018)
+db1 <- full_join(db1,db18_age1)
+
+db20_age1 <- db20 %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2020)
+db1 <- full_join(db1,db20_age1)
+
+db21_age1 <- db21 %>% mutate(Age_edited = case_when(Age >= 50 & Age <= 60 ~ 'Between 50 and 60',
+                                             Age > 60 ~ 'Over 60'), year = 2021)
+db1a <- full_join(db1,db21_age1)
+
+
+```
+
+```{r message=FALSE,warning=FALSE}
+
+db1_summary1 <- db1a %>%
+  select(Continent, year, Age_edited)%>%
+  mutate(year=as.factor(year)) %>%
+  drop_na()%>%
+  group_by(Age_edited,Continent,year)%>%
+  summarise(n = n())
+rm(db1a)
+
+plot_base_clean <- db1_summary1 %>%
+  group_by(Age_edited) %>%
+  #filter(Age_edited == 0)%>%
+  ggplot(aes(x= year, y = n, group = 1, colour=as.factor(Age_edited))) +  
+  geom_line()+
+  geom_point() +
+  #coord_flip()+
+  labs(x = 'Year', y = 'Count', colour='AgeGroup') +
+     # apply basic black and white theme - this theme removes the background colour by default
+  theme_bw() + 
+     # remove gridlines. panel.grid.major is for vertical lines, panel.grid.minor is for horizontal lines
+  #theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    # remove borders
+  theme(panel.border = element_blank(),
+    # removing borders also removes x and y axes. Add them back
+  axis.line = element_line(),
+  axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+rm(db1_summary)
+
+x <- plot_base_clean + facet_wrap(~Continent, nrow = 2) 
+rm(plot_base_clean)
+ggplotly(x)
+```
+From the above graph, there is a direct correlation between count of billionaire and their Age group. So, it can be said that the billionaires retain and grow their wealth.
+
+## Does United States follow the trend as rest of the world? 
+
+Let us find whether growth in the net worth the United States follow the trend in the rest of the world. For this analysis, I have used the data for 2020 and 2022. 
+
+
+```{r message=FALSE,warning=FALSE}
+db20_3y <- db20 %>% select(Year,NetWorth, Country, Industry,Age, Name, Continent)
+db21_3y <- db21 %>% select(Year,NetWorth, Country, Industry,Age,Name, Continent)
+db22_3y <- db22 %>% select(Year,NetWorth, Country, Industry,Age, Name, Continent)
+
+db_3years <- full_join(db20_3y, db21_3y)
+db_3years <- full_join(db_3years, db22_3y)
+
+db_3years_sum_rest <- db_3years %>%
+  filter(Country != 'United States', Year == 2020 | Year == 2022)%>%
+  group_by(Year, Industry) %>%
+  summarise(sum = sum(NetWorth))
+
+db_3years_sum_rest.wide <-db_3years_sum_rest %>%
+  pivot_wider(names_from = "Year",
+              values_from = "sum")
+
+db_3years_sum_usa <- db_3years %>%
+  filter(Country == 'United States', Year == 2020 | Year == 2022)%>%
+  group_by(Year, Industry) %>%
+  summarise(sum = sum(NetWorth))
+
+db_3years_sum_usa.wide <-db_3years_sum_usa %>%
+  pivot_wider(names_from = "Year",
+              values_from = "sum")
+p1 <- db_3years_sum_usa %>%
+  group_by(Year)%>%
+   ggplot(aes(fill=as.factor(Year), y=Industry, x=sum)) + 
+    geom_bar(position="dodge", stat="identity")+
+  labs(x = 'Total NetWorth (Billion)', y = 'Industry', title = 'Industry vs. Networth for USA', fill = 'Year')+
+  theme_bw()
+
+#p1
+
+p2 <- db_3years_sum_rest %>%
+  group_by(Year)%>%
+   ggplot(aes(fill=as.factor(Year), y=Industry, x=sum)) + 
+   geom_bar(position="dodge", stat="identity")+
+  labs(x = 'Total NetWorth (Billion)', y = 'Industry', title = 'Industry vs. Networth for other countries', fill = 'Year')+
+  theme_bw()
+
+#ggplotly(p1) 
+#ggplotly(p2)
+#p2
+
+#p3 <- ggplotly(plot_usa_2020)
+#p4 <- ggplotly(plot_usa_2022)
+
+#gridExtra :: grid.arrange(plot_rest_2020, plot_rest_2022,plot_usa_2020, plot_usa_2022, ncol = 2)
+#subplot(p1, p2)
+```
+```{r}
+ggplotly(p1) 
+```
+Above plot shows that net worth of the billionaires in the industries such as technology and finance & investment was increased greatly during the last 2 years. This may indicate that the work from home culture may have greatly contributed to growth of net worth of the billionaires from technology sector in the United States.
+
+```{r}
+ggplotly(p2)
+```
+
+There was a great increase in manufacturing, retail, healthcare, food & beverage,and finance & investments in other countries. In the case of the United States, technology and finance &investment sector had the rates increase in 2022. In 2022, a tremendous growth was seen for the manufacturing sector. As we can see, the technology sector did not show such a great increase as the United States. 
+
+ 
+# Impact of COVID 19 on Billionaires Wealth Growth Rate in the USA {.tabset}
+
+The COVID 19 pandemic has impacted many lives in the whole world. However, the question is, does COVID 19 pandemic have also impacted the richest people of the United States? To find the answer of this question, I have decided to do hypothesis testing. For this analysis, I have used the Billionaire's list from 2020, 2021, and 2022. 
+```{r message=FALSE,warning=FALSE}
+#Data Cleaning for  analysis of 3 years - 2020, 2021, 2022
+
+
+db20_3y <- db20 %>% select(Year,NetWorth, Country, Industry,Age, Name)
+db21_3y <- db21 %>% select(Year,NetWorth, Country, Industry,Age,Name)
+db22_3y <- db22 %>% select(Year,NetWorth, Country, Industry,Age, Name)
+
+db_3years <- full_join(db20_3y, db21_3y)
+db_3years <- full_join(db_3years, db22_3y)
+
+#write.csv(db_3years,'db_3years.csv')
+```
+
+## Hypothesis
+
+The analysis of the industry shows that there was a significant increase in the money of the billionaires from the technology sector than the other sectors. To further expand the study, let us analyse the trend for the United States and compare it with the rest of the world. This analysis would be done using the Hypothesis analysis. Firstly, I have merged the data and then found the percentage increase for the year 2021 and 2022. After that I added another column which contained the difference for the wealth rate for the 2021 and 2022.  
+
+$$H_{0} : \mu_{D} = 0 $$
+$$H_1 : \mu_{D} \ne 0 $$
+Where μD is the population mean difference of percentage wealth increase for the year 2021 and 2022.
+
+## Assumptions
+
+* The data is Normally Distributed.
+* The sample is representing the full population.
+* The data represents accurate information.
+
+## Descriptive Statistics
+
+```{r message=FALSE,warning=FALSE}
+ha_3years <- db_3years %>%
+  select(Industry, NetWorth, Year, Country) %>%
+  filter(Country == 'United States') %>%
+  group_by(Industry, Year) %>%
+  dplyr::summarise(mean = mean(NetWorth))
+
+x <- ha_3years %>%
+  pivot_wider(names_from = "Year",
+              values_from = "mean")
+
+y <- x %>% 
+  group_by(Industry)%>%
+  mutate(increase2021 = ((`2021`-`2020`)/`2020`)*100,
+         increase2022 = ((`2022`-`2021`)/`2021`)*100)
+temp_ha <- y %>%
+  select(Industry, increase2021, increase2022)
+
+db_ha <- pivot_longer(temp_ha,
+                     cols = c('increase2021','increase2022'),
+                   names_to = 'Year',
+                   values_to = 'Increase')
+
+
+db_ha_diff <- temp_ha %>%
+  select(increase2021, increase2022) %>%
+  mutate(difference = increase2022 - increase2021)
+
+statsEx3 <- db_ha %>%
+  group_by(Year) %>%
+  get_summary_stats(Increase, type="mean_sd")
+
+```
+
+
+```{r message=FALSE,warning=FALSE}
+# Box plot
+
+db_ha %>%
+  ggplot(aes(y = Increase, color = Year))+
+  geom_boxplot()+
+  labs(y="% increase YOY", title = 'Box plot for the distribution in 2021 and 2022')
+```
+
+The above box plot clearly shows that the average growth in wealth of the billionaires has decreased this year as compare to the growth in the year 2021.
+
+```{r message=FALSE,warning=FALSE}
+
+stat_db <- db_ha %>%
+  group_by(Year) %>%
+  shapiro_test(Increase)
+
+stat_db
+```
+
+```{r message=FALSE,warning=FALSE}
+ggqqplot(db_ha, x="Increase", facet.by = "Year")
+db_ha
+```
+
+The qqplot indicates that the data is almost normally distributed.
+
+## Perform Test
+
+```{r message=FALSE,warning=FALSE}
+test3 <-  t.test(temp_ha$increase2021,
+       temp_ha$increase2022,
+       paired=TRUE,
+       conf.level=0.95) 
+
+library(broom)
+library(purrr)
+
+tab <- map_df(list(test3), tidy)
+
+tab
+```
+From the above table, the p-value is less than 0.05, indicating we need to reject the null hypothesis in favor of alternative hypothesis. This may indicated that the COVID has impacted the growth rate in Billionaires' wealth.
+
+# Conclusion
+
+A close look at this project work deals with the following critical concluding observations.
+
+1. The data indicates, there is a non homogeneous wealth distribution among the billionaires through out the world. It is an obvious finding however, charts were able to show the concentration of the billionaires and their wealth clearly.
+
+2. We also found that there are more billionaire in higher age group. Again it is an obvious indication that wealth collection of such amount takes time in years. However, we were also able to find that billionaires preserves their wealth and thus, there are more billionaires with higher age.
+
+3. Our basic assumption was that in 2022, due to disruption that occurred has negatively impacted even to the billionaires. Our paired t-test clearly indicated that growth rate among US Billionaires wealth was mostly positive in 2021. However, in 2022, many different industry's billionaires' businesses are negatively impacted. 
+
+<h4> Scope for the future work </h4>
+
+The billionaire study done for United States can be extended for different regions to know how last 2 years of COVID19 has impacted the other regions as it may be indicative of geopolitical affairs.
+
+
+# References
+
+* Forbes List of billionaires
+* [Wikipedia](https://en.wikipedia.org/wiki/The_World%27s_Billionaires)
+
+
+# About Me
+
+<center>
+![](WhatsApp Image 2022-05-04 at 3.57.31 PM.jpeg){width=20%}
+</center>
+
+
+Hello! I am Parita Brahmbhatt and I am a first year Master's student at School of Computing. I am from India and I have recently moved to the United States. I love good food, dogs and bollywood music.
+
+# Appendix
+
+```{r ref.label=knitr::all_labels(), echo = T, eval = F}
+
+```
